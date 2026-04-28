@@ -755,36 +755,43 @@ class ProfessionalBackupGUI:
             self.btn_cancel_restore.configure(state=tk.DISABLED)
 
     def load_users(self):
-        users = []
+        self.users = []
+
         try:
             cmd = [
-            'powershell',
-            '-Command',
-            "Get-CimInstance Win32_UserProfile | Select-Object -ExpandProperty LocalPath"
-        ]
-        output = subprocess.check_output(cmd, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
+                'powershell',
+                '-Command',
+                "Get-CimInstance Win32_UserProfile | Select-Object -ExpandProperty LocalPath"
+            ]
 
-        for line in output.split('\n'):
-            if "C:\\Users\\" in line:
-                username = line.strip().split("\\")[-1]
-                if username:
-                    users.append(username)
+            output = subprocess.check_output(
+                cmd,
+                text=True,
+                creationflags=subprocess.CREATE_NO_WINDOW
+            )
 
-        exclude = ['Administrator', 'Public', 'Default', 'Default User', 'All Users']
-        users = [u for u in users if u not in exclude]
+            for line in output.split('\n'):
+                if "C:\\Users\\" in line:
+                    username = line.strip().split("\\")[-1]
+                    if username:
+                        self.users.append(username)
+            
+            exclude = ['Administrator', 'Public', 'Default', 'Default User', 'All Users']
+            self.users = [u for u in self.users if u not in exclude]
 
-    except Exception:
-        users = [p.name for p in Path('C:/Users').iterdir() if p.is_dir()]
+        except Exception:
+            self.users = [p.name for p in Path('C:/Users').iterdir() if p.is_dir()]
 
-    self.user_combo['values'] = users
-    if hasattr(self, 'res_user_combo'):
-        self.res_user_combo['values'] = users
+        self.user_combo['values'] = self.users
 
-    if users:
-        self.user_combo.current(0)
         if hasattr(self, 'res_user_combo'):
-            self.res_user_combo.current(0)
-        self.on_user_switch()
+            self.res_user_combo['values'] = self.users
+
+        if self.users:
+            self.user_combo.current(0)
+            if hasattr(self, 'res_user_combo'):
+                self.res_user_combo.current(0)
+            self.on_user_switch()
 
     def on_user_switch(self, event=None):
         user = self.selected_user.get()
