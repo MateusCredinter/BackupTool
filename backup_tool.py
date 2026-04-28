@@ -755,9 +755,9 @@ class ProfessionalBackupGUI:
             self.btn_cancel_restore.configure(state=tk.DISABLED)
 
     def load_users(self):
-    users = []
-    try:
-        cmd = [
+        users = []
+        try:
+            cmd = [
             'powershell',
             '-Command',
             "Get-CimInstance Win32_UserProfile | Select-Object -ExpandProperty LocalPath"
