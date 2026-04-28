@@ -773,7 +773,7 @@ class ProfessionalBackupGUI:
         exclude = ['Administrator', 'Public', 'Default', 'Default User', 'All Users']
         users = [u for u in users if u not in exclude]
 
-    except Exception as e:
+    except Exception:
         users = [p.name for p in Path('C:/Users').iterdir() if p.is_dir()]
 
     self.user_combo['values'] = users
